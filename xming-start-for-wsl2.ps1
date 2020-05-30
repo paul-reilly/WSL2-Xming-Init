@@ -1,6 +1,6 @@
 function Get-WSL2IPAddress{
     param([string]$distro)
-    $ifconfig_cmd = @("run", "ifconfig");
+    $ifconfig_cmd = @("run", "ifconfig eth0");
     try {
         $cmd_output = & $distro $ifconfig_cmd
     } 
