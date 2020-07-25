@@ -1,6 +1,6 @@
 function Get-WSL2IPAddress{
     param([string]$distro)
-    $ifconfig_cmd = @("run", "ifconfig eth0");
+    $ifconfig_cmd = @("run", "ip a show eth0 | grep -E -o '([0-9]{1,3}[\.]){3}[0-9]{1,3}'"); #/[0-9]{2}
     try {
         $cmd_output = & $distro $ifconfig_cmd
     } 
@@ -9,7 +9,7 @@ function Get-WSL2IPAddress{
         return $null
     }
     foreach ($line in $cmd_output) {
-        if ($line -match 'inet (?<IP>.+)  netmask .+  broadcast') {
+        if ($line -match '(?<IP>.+)') {
           return $Matches.IP
         }
     }
@@ -27,13 +27,13 @@ function getIPAddress {
 
 function main {
     $ip = getIPAddress
-    write-output $ip
+    write-output "(ps$)ipconfig WSL '$ip'"
 
     # needs file made executable with "chmod a+x ~/.wslrc"
     $cmd = "`"export DISPLAY=$($ip):0`""
     $save_to_file = " > ~/.wslrc"
     try {
-        & "ubuntu" "run" "echo" $cmd $save_to_file
+        & "debian" "run" "echo" $cmd $save_to_file
     }
     catch {
         write-error "Error: could not execute 'export DISPLAY' command on Linux."
@@ -47,8 +47,8 @@ function main {
         write-output "Process stopped."
     }
 
-    if ($ip_address = Get-WSL2IPAddress -d ubuntu) {
-        write-output "Starting Xming, listening on: $ip_address"
+    if ($ip_address = Get-WSL2IPAddress -d Debian) {
+        write-output "Starting Xming, listening on (bash$) ip a: $ip_address"
         try {
             set-content -path "C:\\Program Files (x86)\\Xming\\X0.hosts" -encoding ASCII -value $ip_address
         }
@@ -57,7 +57,7 @@ function main {
         }
         # TODO: attempting to start using '-from' the WSL2 IP is not working, have to edit Xming/X0.hosts
         #        but it's in Program Files so needs admin
-        write-output (& "C:\\Program Files (x86)\\Xming\\Xming.exe" ":0" "-clipboard" "-multiwindow") # "-from $ip_address")
+        write-output (& "C:\\Program Files (x86)\\Xming\\Xming.exe" ":0" "-clipboard" "-multiwindow" ) # "-from $ip_address")
     }
     else {
         write-error "Error: attempt to get IP address from WSL2 ifconfig failed."
