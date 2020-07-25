@@ -8,7 +8,7 @@ and being able to run X11 apps.
 ## Required
 - A functional Windows Linux Subsystem v2 (WSL2) Debian distro on windows 10  
 - X11 apps (at least do `apt install xeyes` or `xterm`)  
-- Xming, _installing the fonts too is highly suggested_  
+- Xming, _installing the fonts too is [highly suggested](https://www.youtube.com/watch?v=YS5fCtt7yjE)_  
 - Admin permissions for both win10 and wsl user  
 
 ## What the script does 
